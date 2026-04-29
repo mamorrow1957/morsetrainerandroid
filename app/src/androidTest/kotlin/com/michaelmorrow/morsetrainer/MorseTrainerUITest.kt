@@ -49,9 +49,9 @@ class MorseTrainerUITest {
     }
 
     @Test
-    fun footerLabelContainsAttribution() {
+    fun footerLabelContainsCopyright() {
         launch()
-        composeRule.onNodeWithTag("footerLabel").assertTextContains("Michael Morrow")
+        composeRule.onNodeWithTag("footerLabel").assertTextContains("Business Casual Software LLC")
     }
 
     @Test
