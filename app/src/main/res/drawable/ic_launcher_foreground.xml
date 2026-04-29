@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Morse code dots and dashes representing "MT" -->
+    <!-- Dot row -->
+    <path android:fillColor="#ff4d00" android:pathData="M30,44 a6,6 0 1,0 12,0 a6,6 0 1,0 -12,0" />
+    <path android:fillColor="#ff4d00" android:pathData="M50,44 a6,6 0 1,0 12,0 a6,6 0 1,0 -12,0" />
+    <path android:fillColor="#ff4d00" android:pathData="M70,44 a6,6 0 1,0 12,0 a6,6 0 1,0 -12,0" />
+    <!-- Dash -->
+    <rect android:fillColor="#ff4d00" android:x="28" android:y="58" android:width="52" android:height="12" android:rx="6" />
+</vector>
