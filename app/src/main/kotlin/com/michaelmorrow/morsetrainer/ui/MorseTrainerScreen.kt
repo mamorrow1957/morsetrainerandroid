@@ -164,7 +164,7 @@ private fun Header() {
 @Composable
 private fun Footer() {
     Text(
-        text = "vibe coded in Feb–Apr 2026 by Michael Morrow",
+        text = "©2026 Business Casual Software LLC",
         color = AppAccent,
         fontSize = 12.sp,
         modifier = Modifier
