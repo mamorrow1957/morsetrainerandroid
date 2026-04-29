@@ -90,12 +90,12 @@ The screen background must be uniformly dark grey with no visible dividers betwe
 
 - Contains the app title: **"Morse Trainer"** with a typewriter character-by-character animation on launch, accompanied by mechanical click sounds
 - Text color: `#e0e0e0` (very light grey)
-- Font: **1942 Report** (`report1942`) custom font loaded via `FontFamily(Font(R.font.report1942))`, displayed at a fixed `32.sp`. (Auto-sizing to the text box width is not implemented; `32.sp` fits all current phone sizes without clipping.)
+- Font: **1942 Report** (`report1942`) custom font loaded via `FontFamily(Font(R.font.report1942))`, displayed at a fixed `42.sp`, centered (`TextAlign.Center`). (Auto-sizing to the text box width is not implemented; `42.sp` fits all current phone sizes without clipping.)
 - Centered horizontally with horizontal padding of `20.dp` to align with the text box edges
 
 ### 3.3 Footer
 
-- Contains the attribution string: **"vibe coded in Feb–Apr 2026 by Michael Morrow"**
+- Contains the copyright string: **"©2026 Business Casual Software LLC"**
 - Text color: `#ff4d00`
 - Centered, small font (`fontSize = 12.sp`)
 
@@ -105,10 +105,11 @@ The main content region holds the text box, the Learn/Test mode picker, the spee
 
 | Element | Size |
 |---------|------|
+| Top spacer (above text box) | 10% of available height |
 | Text box height | 34% of available height |
 | Gap between text box and controls | 3% of available height |
 | Gap between controls and button | 3% of available height |
-| Bottom spacer (pushes content above centre) | 19% of available height |
+| Bottom spacer | 12% of available height |
 
 ---
 
