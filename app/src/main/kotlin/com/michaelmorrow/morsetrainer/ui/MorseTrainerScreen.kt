@@ -45,6 +45,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
@@ -149,9 +150,10 @@ private fun Header() {
         Text(
             text = titleText,
             fontFamily = Report1942Font,
-            fontSize = 32.sp,
+            fontSize = 42.sp,
             color = HeaderText,
             maxLines = 1,
+            textAlign = TextAlign.Center,
             modifier = Modifier
                 .fillMaxWidth()
                 .semantics { testTag = "titleLabel" },
