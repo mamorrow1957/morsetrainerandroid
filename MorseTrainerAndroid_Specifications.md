@@ -462,4 +462,64 @@ Test tags are applied via `Modifier.semantics { testTag = "..." }` (or `Modifier
 
 ---
 
+## 13. Differences from the Web Version
+
+The web version of Morse Trainer (`morsetrainerweb`) shares the same core logic (Wikipedia API, sentence extraction, Morse timing, Morse table, color scheme, and font) but differs in several areas. The table below summarises what each platform has that the other does not, and where behaviour diverges.
+
+### 13.1 Features Present in the Web Version but Not (Yet) in Android
+
+| Feature | Web behaviour | Android status |
+|---------|--------------|----------------|
+| **Pause / Resume** | A dedicated Pause button halts playback mid-sentence and a Resume button continues from the same position; Learn-mode text is preserved across pause/resume | Not implemented — "Stop sending" terminates playback permanently and advances to Reveal |
+| **Restart** | A Restart button replays the current sentence from the beginning without revealing the article | Not implemented |
+| **Tone-frequency slider** | A second slider (400–1000 Hz, default 650 Hz) lets the user tune the sidetone in real time; frequency is sampled per symbol so changes take effect immediately | Not implemented — tone is fixed at 650 Hz in `MorseEngine` |
+| **Transcription textarea** | A separate writable textarea below the text box where the user can type their guess during playback | Not implemented |
+| **Mode switch disabled during playback** | The Learn/Test toggle is visually greyed out while Morse is playing and re-enabled on pause or completion | The segmented button is never visually disabled; mode changes are silently rejected in the ViewModel |
+| **Click-suppression envelope** | Audio tone edges are ramped over min(6 ms, 10 % of tone duration) using `GainNode.linearRampToValueAtTime` to suppress key clicks | Not implemented — tones start and stop abruptly |
+| **Responsive / scalable layout** | Font sizes use `clamp()` and layout adapts to viewport width; sliders stack vertically below 700 px | Layout is portrait-locked with fixed proportional heights; no landscape or tablet layout |
+| **Session-persistent title animation** | Title animation plays only once per browser session (gated by `sessionStorage`); subsequent page loads show the full title immediately | Title animation replays on every app launch |
+
+### 13.2 Features Present in Android but Not in the Web Version
+
+| Feature | Android behaviour |
+|---------|------------------|
+| **Title animation audio** | Each character of the typewriter header animation plays an 880 Hz mechanical click (5 ms, 44 100 Hz, PCM_FLOAT via `AudioTrack`) 80 ms apart |
+| **Explicit fetch timeout** | `HttpURLConnection` has `connectTimeout = 10 000 ms` and `readTimeout = 10 000 ms` | The web `fetch()` call has no explicit timeout |
+| **Test tag semantics** | All interactive elements carry `Modifier.semantics { testTag = "..." }` (with `mergeDescendants = true` on containers) for automated Compose UI testing |
+| **Portrait orientation lock** | `android:screenOrientation="sensorPortrait"` prevents landscape use |
+
+### 13.3 Button Model Difference
+
+The two platforms implement different interaction models for the primary controls:
+
+| | Android | Web |
+|-|---------|-----|
+| **Buttons** | 1 button cycling through 4 states | 3 independent buttons: Find/Stop/Reveal, Pause/Resume, Restart |
+| **Stop vs Pause** | "Stop sending" immediately ends playback and moves to Reveal | Separate Pause (preserves position) and Stop (ends playback) actions |
+| **Restart** | Not available | Available at any point during sending or after stopping |
+
+### 13.4 Audio Implementation Differences
+
+| Property | Android | Web |
+|----------|---------|-----|
+| API | `AudioTrack` (PCM streaming, Java/Kotlin) | Web Audio API (`AudioContext`, `OscillatorNode`, `GainNode`) |
+| Tone frequency | 650 Hz (hardcoded) | 650 Hz default, adjustable 400–1000 Hz via slider |
+| Amplitude | 0.7 (linear PCM scale) | 0.45 (`GainNode` gain) |
+| Click suppression | None | Gain envelope ramp on tone start/end |
+| Fallback | Timed delays (`kotlinx.coroutines.delay`) if `AudioTrack` fails | Timed delays (`setTimeout`) if `AudioContext` unavailable |
+
+### 13.5 Shared Behaviour (for Reference)
+
+The following are identical across both platforms and must stay in sync:
+
+- Wikipedia API endpoint and JSON field extraction (`extract`, `title`, `content_urls`)
+- Sentence extraction rules and fallback (§8.1)
+- Morse character table including all punctuation (§9.7)
+- Timing formula: `unitSeconds = 60.0 / (cpm × 8.0)` with inter-word gap at 3.5 units
+- Color palette: background `#1a1a1a`, accent `#ff4d00`, surface `#e8e8e8`
+- 1942 Report custom font for the header
+- Learn-mode character reveal (appended at first symbol of each character)
+
+---
+
 *End of Specifications*
