@@ -27,6 +27,9 @@ MorseTrainerAndroid/
 │       │   ├── kotlin/com/michaelmorrow/morsetrainer/
 │       │   │   ├── MainActivity.kt                  # App entry point
 │       │   │   ├── ui/
+│       │   │   │   ├── theme/
+│       │   │   │   │   ├── Color.kt                 # Compose color constants
+│       │   │   │   │   └── Theme.kt                 # MaterialTheme + font family
 │       │   │   │   └── MorseTrainerScreen.kt        # Root composable screen
 │       │   │   ├── viewmodel/
 │       │   │   │   └── MorseViewModel.kt            # App state and business logic
@@ -37,20 +40,34 @@ MorseTrainerAndroid/
 │       │   │       ├── MorseEngine.kt               # Morse code playback engine
 │       │   │       └── SentenceExtractor.kt         # Sentence extraction logic
 │       │   └── res/
+│       │       ├── drawable/
+│       │       │   ├── ic_launcher_background.xml
+│       │       │   └── ic_launcher_foreground.xml
 │       │       ├── font/
 │       │       │   └── report1942.ttf               # 1942 Report custom font (Johan Holmdahl, freeware)
+│       │       ├── mipmap-anydpi-v26/
+│       │       │   ├── ic_launcher.xml
+│       │       │   └── ic_launcher_round.xml
 │       │       └── values/
 │       │           ├── colors.xml
-│       │           └── strings.xml
+│       │           ├── strings.xml
+│       │           └── themes.xml
 │       ├── test/
 │       │   └── kotlin/com/michaelmorrow/morsetrainer/
 │       │       ├── MorseViewModelTest.kt            # JUnit unit tests
-│       │       ├── SentenceExtractorTest.kt
-│       │       └── MorseEngineTest.kt
+│       │       └── SentenceExtractorTest.kt
 │       └── androidTest/
 │           └── kotlin/com/michaelmorrow/morsetrainer/
 │               └── MorseTrainerUITest.kt            # Compose UI tests
-└── build.gradle.kts
+├── build.gradle.kts
+├── gradle/
+│   ├── libs.versions.toml                           # Version catalog
+│   └── wrapper/
+│       ├── gradle-wrapper.jar
+│       └── gradle-wrapper.properties
+├── gradle.properties
+├── gradlew
+└── settings.gradle.kts
 ```
 
 ---
@@ -73,7 +90,7 @@ The screen background must be uniformly dark grey with no visible dividers betwe
 
 - Contains the app title: **"Morse Trainer"** with a typewriter character-by-character animation on launch, accompanied by mechanical click sounds
 - Text color: `#e0e0e0` (very light grey)
-- Font: **1942 Report** (`report1942`) custom font loaded via `FontFamily(Font(R.font.report1942))`, auto-scaled to match the width of the text box using `autoSize` text or `adjustsFontSizeToFit`-equivalent logic
+- Font: **1942 Report** (`report1942`) custom font loaded via `FontFamily(Font(R.font.report1942))`, displayed at a fixed `32.sp`. (Auto-sizing to the text box width is not implemented; `32.sp` fits all current phone sizes without clipping.)
 - Centered horizontally with horizontal padding of `20.dp` to align with the text box edges
 
 ### 3.3 Footer
@@ -138,6 +155,8 @@ A segmented control placed to the **left of the speed slider**, in a `Row` withi
 | Selected segment color | `#ff4d00` (orange) — always, including during playback (`selectedContainerColor` in `SegmentedButtonDefaults.colors()`) |
 | Non-selected segment background | Dark grey (`Color(0xFF404040)`) with white text |
 | Label font | `MaterialTheme.typography.labelMedium` |
+
+> **Note:** `SingleChoiceSegmentedButtonRow` and `SegmentedButton` are `@ExperimentalMaterial3Api` in Material3 1.2.x. Annotate the composable that uses them with `@OptIn(ExperimentalMaterial3Api::class)`.
 
 The picker is **never visually disabled**. Instead, mode changes triggered during active playback are silently rejected in `MorseViewModel` (the `mode` setter restores the previous value if `appState == AppState.Sending` or `AppState.Loading`). This prevents the selected segment from changing colour during playback.
 
@@ -348,10 +367,10 @@ Any punctuation not in this table is silently skipped.
   - `AppBackground` → `Color(0xFF1A1A1A)`
   - `AppAccent` → `Color(0xFFFF4D00)`
   - `SurfaceBackground` → `Color(0xFFE8E8E8)`
-- The status bar and navigation bar must use the dark background color. Set via `WindowCompat.setDecorFitsSystemWindows(window, false)` and `SystemUiController` (Accompanist) or `WindowInsetsControllerCompat`.
+- The status bar and navigation bar must use the dark background color. Call `enableEdgeToEdge()` in `MainActivity.onCreate()` (from `androidx.activity:activity-compose`) — this is the modern replacement for the deprecated Accompanist `SystemUiController` / `WindowCompat.setDecorFitsSystemWindows` approach. The window theme in `themes.xml` sets `android:statusBarColor` and `android:navigationBarColor` to `#1a1a1a` as a fallback.
 - The layout must be usable on all current Android phone screen sizes in portrait orientation.
-- **Phone is locked to portrait only** (`android:screenOrientation="portrait"` in `<activity>` in `AndroidManifest.xml`).
-- **Tablets (sw600dp+) support all orientations.** In portrait, the layout matches phone. In landscape, a two-column layout is used: the left column (62% width) holds the text box; the right column (38% width) holds the controls and button. The header and footer span the full width above and below the columns respectively. Use `LocalConfiguration.current.screenWidthDp >= 600` and `isLandscape` checks to switch between layouts.
+- **Phone is locked to portrait only** (`android:screenOrientation="sensorPortrait"` in `<activity>` in `AndroidManifest.xml`). `sensorPortrait` is used rather than `portrait` so the screen also works when the device is held upside-down.
+- **Tablet two-column landscape layout is not yet implemented.** The app currently renders as a single column on tablets. Future work: detect `LocalConfiguration.current.screenWidthDp >= 600 && isLandscape` and render the left column (62% width) with the text box and right column (38%) with the controls and button.
 - Support Dynamic Type / font scaling for accessibility (`sp` units for all text sizes).
 
 ---
@@ -432,6 +451,7 @@ UI tests use `createComposeRule()` (`ComposeTestRule`) and interact with the UI 
 | `mode` | `StateFlow<Mode>` | `Mode.Learn`, `Mode.Test` |
 | `wpm` | `StateFlow<Int>` | Current speed in WPM (converted to CPM ×5 for engine) |
 | `displayText` | `StateFlow<String>` | Text box content |
+| `articleUrl` | `StateFlow<String?>` | URL of the revealed article; non-null only in Idle state after Reveal |
 | `"textbox"` | Test tag | Text display area |
 | `"modeSwitch"` | Test tag | Learn/Test picker |
 | `"speedSlider"` | Test tag | WPM slider |
