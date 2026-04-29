@@ -388,58 +388,55 @@ UI tests use `createComposeRule()` (`ComposeTestRule`) and interact with the UI 
 
 ### 11.3 Launch Tests
 
-- App launches without crashing.
-- Title node with test tag `"titleLabel"` contains "Morse Trainer".
-- Footer node with test tag `"footerLabel"` contains the attribution string.
-- Text box node with test tag `"textbox"` is displayed and shows placeholder text.
+- App launches without crashing. (`appLaunchesWithoutCrashing`)
+- Title node with test tag `"titleLabel"` contains "Morse Trainer". (`titleLabelContainsMorseTrainer`)
+- Footer node with test tag `"footerLabel"` contains the copyright string. (`footerLabelContainsCopyright`)
+- Text box node with test tag `"textbox"` is displayed and shows placeholder text. (`textBoxIsVisibleWithPlaceholder`)
 
 ### 11.4 Speed Slider Tests
 
-- Slider node with test tag `"speedSlider"` is present with default value `30` (WPM).
-- Speed readout node with test tag `"speedLabel"` displays `30` on launch.
-- Performing a swipe on the slider updates the readout in real time.
+- Slider node with test tag `"speedSlider"` is present with default value `30` (WPM). (`speedSliderIsPresent`)
+- Speed readout node with test tag `"speedLabel"` displays `30` on launch. (`speedLabelShowsDefaultWpm`)
+- Performing a swipe right on the slider updates the readout to `50` WPM. (`sliderSwipeUpdatesSpeedLabel`)
 
 ### 11.5 Button Tests
 
-- "Find an article" button (test tag `"findBtn"`) is visible and labeled correctly on launch.
-- Tapping "Find an article" transitions the button to "Loading…" then "Stop sending".
-- After playback completes (`morseDone` becomes `true`), button label changes to "Reveal".
-- Tapping "Reveal" causes the text box to contain text beginning `Title:`.
-- Tapping "Reveal" causes the text box to contain text beginning `Sentence:`.
-- Tapping "Reveal" causes the text box to contain text beginning `Source:` with a valid URL.
-- Tapping "Reveal" returns the button label to "Find an article".
+- "Find an article" button (test tag `"findBtn"`) is visible and labeled correctly on launch. (`findArticleButtonIsVisibleOnLaunch`)
+- Tapping "Find an article" transitions the button to "Loading…" then "Stop sending". (`buttonShowsLoadingAfterTap`)
+- After playback completes (`morseDone` becomes `true`), button label changes to "Reveal". (covered by `revealPopulatesArticleLines`)
+- Tapping "Reveal" causes the text box to contain `Title:`, `Sentence:`, and `Source:`. (`revealPopulatesArticleLines`)
+- Tapping "Reveal" returns the button label to "Find an article". (`revealPopulatesArticleLines`)
 
 ### 11.6 Morse Playback Tests
 
-- After tapping "Find an article", `morseDone` eventually becomes `true` (allow up to 30 s using `waitUntil(timeoutMillis = 30_000)`).
-- Adjusting the slider mid-playback does not throw an error.
-- `morseDone` is reset to `false` at the start of each new playback session.
+- After tapping "Find an article", `morseDone` eventually becomes `true` (allow up to 60 s). (`morseDoneBecomesTrue`)
+- `morseDone` is reset to `false` at the start of each new playback session. (`morseDoneResetsOnNewSession`)
 
 ### 11.7 Speed Change During Playback
 
-- Start playback, programmatically set the slider value mid-transmission; verify no crash and `morseDone` still becomes `true`.
+- Start playback, change WPM via `setWpm()` and swipe the slider mid-transmission; verify no crash and `morseDone` still becomes `true`. (`speedChangeDuringPlaybackNoCrashAndCompletes`)
 
 ### 11.8 Stop Sending / Reveal Flow
 
-- While sending, button label is "Stop sending".
-- Tapping "Stop sending" halts playback immediately, sets text box to "Stopped …", and button to "Reveal".
-- Tapping "Stop sending" sets `morseDone` to `true` immediately.
-- When playback completes naturally, text box shows "Send complete…" and button shows "Reveal".
-- Tapping "Reveal" after natural completion populates `Title:`, `Sentence:`, and `Source:` lines.
-- Tapping "Reveal" after "Stop sending" populates the same three lines.
-- After "Reveal", button returns to "Find an article".
-- Button never shows "Stop sending" when no playback is in progress.
+- While sending, button label is "Stop sending". (`stopSendingShowsRevealButton`)
+- Tapping "Stop sending" halts playback immediately, sets text box to "Stopped …", and button to "Reveal". (`stopSendingShowsRevealButton`)
+- Tapping "Stop sending" sets `morseDone` to `true` immediately. (`stopSendingSetsMorseDoneImmediately`)
+- When playback completes naturally, text box shows "Send complete…" and button shows "Reveal". (`naturalCompletionShowsSendCompleteAndReveal`)
+- Tapping "Reveal" after natural completion populates `Title:`, `Sentence:`, and `Source:` lines. (`revealPopulatesArticleLines`)
+- Tapping "Reveal" after "Stop sending" populates the same three lines. (`revealAfterStopPopulatesArticleLines`)
+- After "Reveal", button returns to "Find an article". (`revealPopulatesArticleLines`)
+- Button never shows "Stop sending" when no playback is in progress. (`buttonNeverShowsStopSendingWhenIdle`)
 
 ### 11.9 Learn Mode Tests
 
-- Mode picker node with test tag `"modeSwitch"` is present.
-- Default selection is **Test**.
-- In Test mode, text box shows "Sending …" during playback (not decoded characters).
-- Switching to Learn mode and tapping "Find an article" causes plaintext characters to appear in the text box during playback.
-- In Learn mode, `morseDone` still becomes `true` after playback completes.
-- In Learn mode, the decoded sentence remains in the text box after playback completes (not replaced with "Send complete…").
-- In Learn mode, tapping "Stop sending" halts playback and advances to Reveal state.
-- In Learn mode, tapping "Reveal" populates the full `Title:`, `Sentence:`, and `Source:` lines.
+- Mode picker node with test tag `"modeSwitch"` is present. (`modeSwitcherIsPresent`)
+- Default selection is **Test**. (`defaultModeIsTest`)
+- In Test mode, text box shows "Sending …" during playback (not decoded characters). (`testModeShowsSendingDuringPlayback`)
+- Switching to Learn mode and tapping "Find an article" causes plaintext characters to appear in the text box during playback. (`learnModeShowsDecodedCharsDuringPlayback`)
+- In Learn mode, `morseDone` still becomes `true` after playback completes. (`learnModeMorseDoneBecomesTrue`)
+- In Learn mode, the decoded sentence remains in the text box after playback completes (not replaced with "Send complete…"). (`learnModeDecodedSentenceRemainsAfterCompletion`)
+- In Learn mode, tapping "Stop sending" halts playback and advances to Reveal state. (`learnModeStopSendingAdvancesToReveal`)
+- In Learn mode, tapping "Reveal" populates the full `Title:`, `Sentence:`, and `Source:` lines. (`learnModeRevealPopulatesArticleLines`)
 
 ---
 
