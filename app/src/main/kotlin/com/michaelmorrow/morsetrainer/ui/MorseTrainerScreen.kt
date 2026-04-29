@@ -96,7 +96,7 @@ fun MorseTrainerScreen(vm: MorseViewModel = viewModel()) {
                     .padding(horizontal = 20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Spacer(modifier = Modifier.height(availableHeight * 0.03f))
+                Spacer(modifier = Modifier.height(availableHeight * 0.10f))
 
                 TextBox(
                     displayText = displayText,
@@ -120,7 +120,7 @@ fun MorseTrainerScreen(vm: MorseViewModel = viewModel()) {
 
                 ActionButton(appState = appState, vm = vm)
 
-                Spacer(modifier = Modifier.height(availableHeight * 0.19f))
+                Spacer(modifier = Modifier.height(availableHeight * 0.12f))
             }
         }
 
