@@ -169,7 +169,7 @@ private fun Footer() {
         fontSize = 12.sp,
         modifier = Modifier
             .padding(8.dp)
-            .semantics { testTag = "footerLabel" },
+            .semantics(mergeDescendants = true) { testTag = "footerLabel" },
     )
 }
 
@@ -181,13 +181,14 @@ private fun TextBox(
     modifier: Modifier = Modifier,
 ) {
     val uriHandler = LocalUriHandler.current
+    val scrollState = rememberScrollState()
 
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(8.dp))
             .background(SurfaceBackground)
             .padding(12.dp)
-            .semantics { testTag = "textbox" },
+            .semantics(mergeDescendants = true) { testTag = "textbox" },
     ) {
         if (displayText.isEmpty()) {
             Text(
@@ -229,7 +230,6 @@ private fun TextBox(
                     if (idx < lines.lastIndex) append("\n")
                 }
             }
-            val scrollState = rememberScrollState()
             androidx.compose.foundation.text.ClickableText(
                 text = annotated,
                 style = TextStyle(fontSize = 15.sp, lineHeight = 22.sp),
@@ -241,7 +241,6 @@ private fun TextBox(
             )
         } else {
             val errorColor = if (displayText.startsWith("Error")) Color.Red else Color.Black
-            val scrollState = rememberScrollState()
             Text(
                 text = displayText,
                 color = errorColor,
@@ -304,7 +303,7 @@ private fun ControlsRow(
                 text = "Speed: $wpm WPM",
                 color = AppAccent,
                 fontSize = 13.sp,
-                modifier = Modifier.semantics { testTag = "speedLabel" },
+                modifier = Modifier.semantics(mergeDescendants = true) { testTag = "speedLabel" },
             )
             Slider(
                 value = wpm.toFloat(),
